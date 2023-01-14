@@ -1079,5 +1079,10 @@ export default {
   .active-background {
     background-color: mui-color('yellow', '200');
   }
+
+  .active-user {
+    color: mui-color('green');
+  }
+
 }
 </style>
