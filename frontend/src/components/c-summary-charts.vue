@@ -99,7 +99,8 @@
         .summary-chart__title--author-repo(v-if="filterGroupSelection === 'groupByAuthors'") {{ user.repoName }}
         .summary-chart__title--name(
           v-if="filterGroupSelection !== 'groupByAuthors'",
-          v-bind:class="{ warn: user.name === '-' }"
+          v-bind:class="{ warn: user.name === '-', \
+          'active-user': user.name === activeUser && user.repoName === activeRepo }"
         ) {{ user.displayName }} ({{ user.name }})
         .summary-chart__title--contribution.mini-font [{{ user.checkedFileTypeContribution }} lines]
         a(
