@@ -93,11 +93,13 @@
       v-bind:key="slice.hash",
       v-bind:class="{ 'message-body active': slice.messageBody !== '' }"
     )
-      a.message-title(v-bind:href="getSliceLink(slice)",
-        v-bind:class="!isBrokenLink(getSliceLink(slice)) ? '' : 'broken-link'", target="_blank")
-        .within-border {{ slice.messageTitle.substr(0, 50) }}
-        .not-within-border(v-if="slice.messageTitle.length > 50")
-          |{{ slice.messageTitle.substr(50) }}
+      .tooltip()
+        a.message-title(v-bind:href="getSliceLink(slice)",
+          v-bind:class="!isBrokenLink(getSliceLink(slice)) ? '' : 'broken-link'", target="_blank")
+          span.tooltip-text Click to view the detailed file changes in the commit
+          .within-border {{ slice.messageTitle.substr(0, 50) }}
+          .not-within-border(v-if="slice.messageTitle.length > 50")
+            |{{ slice.messageTitle.substr(50) }})
       span &nbsp; ({{ slice.insertions }} lines) &nbsp;
       .hash
         span {{ slice.hash.substr(0, 7) }}
