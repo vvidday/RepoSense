@@ -181,6 +181,9 @@ export default {
         * window.comparator(commitSortFunction)(a, b);
     },
     filteredUser() {
+      if (!this.localInfo) {
+        return null;
+      }
       const {
         zUser, zSince, zUntil, zTimeFrame,
       } = this.localInfo;
@@ -194,6 +197,9 @@ export default {
     },
     selectedCommits() {
       const commits = [];
+      if (this.filteredUser === null) {
+        return commits;
+      }
       this.filteredUser.commits.forEach((commit) => {
         const filteredCommit = { ...commit };
         filteredCommit.commitResults = [];
@@ -301,6 +307,9 @@ export default {
 
     updateFileTypes() {
       const commitsFileTypes = new Set();
+      if (!this.filteredUser) {
+        return;
+      }
       this.filteredUser.commits.forEach((commit) => {
         commit.commitResults.forEach((slice) => {
           Object.keys(slice.fileTypesAndContributionMap).forEach((fileType) => {
