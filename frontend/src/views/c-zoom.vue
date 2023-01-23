@@ -143,6 +143,7 @@ const getFontColor = window.getFontColor;
 
 function zoomInitialState() {
   return {
+    localInfo: null,
     showAllCommitMessageBody: true,
     commitsSortType: 'time',
     toReverseSortedCommits: true,
@@ -166,6 +167,10 @@ export default {
     };
   },
 
+  beforeMount() {
+    this.$data.localInfo = JSON.parse(JSON.stringify(this.info));
+  },
+
   computed: {
     sortingFunction() {
       const commitSortFunction = this.commitsSortType === 'time'
@@ -178,9 +183,8 @@ export default {
     filteredUser() {
       const {
         zUser, zSince, zUntil, zTimeFrame,
-      } = this.info;
-      const filteredUser = Object.assign({}, zUser);
-
+      } = this.localInfo;
+      const filteredUser = zUser;
       const date = zTimeFrame === 'week' ? 'endDate' : 'date';
       filteredUser.commits = zUser.commits.filter(
           (commit) => commit[date] >= zSince && commit[date] <= zUntil,
@@ -269,6 +273,14 @@ export default {
   methods: {
     initiate() {
       // This code crashes if info.zUser is not defined
+      this.localInfo = JSON.parse(JSON.stringify(this.info));
+      this.localInfo.zUser.commits.forEach((commit) => {
+        commit.commitResults.forEach((slice) => {
+          if (slice.messageBody !== '') {
+            slice.isOpen = true;
+          }
+        });
+      });
       this.updateFileTypes();
       this.selectedFileTypes = this.fileTypes.slice();
     },
@@ -401,7 +413,7 @@ export default {
 
     getFontColor,
   },
-  created() {
+  mounted() {
     this.initiate();
     this.retrieveHashes();
     this.setInfoHash();
