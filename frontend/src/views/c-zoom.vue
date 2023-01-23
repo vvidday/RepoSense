@@ -121,13 +121,12 @@
           span &nbsp;{{ tag }}
       a(
         v-if="slice.messageBody !== ''",
-        v-on:click="updateExpandedCommitMessagesCount",
-        onclick="toggleNext(this)"
+        v-on:click="toggleSelectedCommitMessageBody(slice.hash)"
       )
         .tooltip
           font-awesome-icon.commit-message--button(icon="ellipsis-h")
           span.tooltip-text Click to show/hide the commit message body
-      .body(v-if="slice.messageBody !== ''")
+      .body(v-if="slice.messageBody !== ''", v-show="slice.isOpen")
         pre {{ slice.messageBody }}
           .dashed-border
 </template>
@@ -162,7 +161,6 @@ export default {
   },
   data() {
     return {
-      expandedCommitMessagesCount: this.totalCommitMessageBodyCount,
       ...zoomInitialState(),
     };
   },
@@ -228,6 +226,11 @@ export default {
 
       return nonEmptyCommitMessageCount;
     },
+    expandedCommitMessagesCount() {
+      return this.selectedCommits.reduce((prev, commit) => (
+        prev + commit.commitResults.filter((slice) => slice.isOpen).length
+      ), 0);
+    },
     isSelectAllChecked: {
       get() {
         return this.selectedFileTypes.length === this.fileTypes.length;
@@ -257,14 +260,6 @@ export default {
       Object.assign(this.$data, newData);
       this.initiate();
       this.setInfoHash();
-    },
-    selectedFileTypes: {
-      deep: true,
-      handler() {
-        this.$nextTick(() => {
-          this.updateExpandedCommitMessagesCount();
-        });
-      },
     },
     commitsSortType() {
       window.addHash('zCST', this.commitsSortType);
@@ -375,24 +370,26 @@ export default {
       encodeHash();
     },
 
-    toggleAllCommitMessagesBody(isActive) {
-      this.showAllCommitMessageBody = isActive;
-
-      const toRename = this.showAllCommitMessageBody
-        ? 'commit-message message-body active'
-        : 'commit-message message-body';
-
-      const commitMessageClasses = document.getElementsByClassName('commit-message message-body');
-      Array.from(commitMessageClasses).forEach((commitMessageClass) => {
-        commitMessageClass.className = toRename;
+    toggleSelectedCommitMessageBody(commitHash) {
+      this.localInfo.zUser.commits.forEach((commit) => {
+        commit.commitResults.forEach((slice) => {
+          if (slice.hash === commitHash) {
+            slice.isOpen = !slice.isOpen;
+          }
+        });
       });
-
-      this.expandedCommitMessagesCount = isActive ? this.totalCommitMessageBodyCount : 0;
     },
 
-    updateExpandedCommitMessagesCount() {
-      this.expandedCommitMessagesCount = document.getElementsByClassName('commit-message message-body active')
-          .length;
+    toggleAllCommitMessagesBody(isActive) {
+      this.showAllCommitMessageBody = isActive;
+      const selectedHashes = this.selectedCommits.flatMap((commit) => commit.commitResults.map((slice) => slice.hash));
+      this.localInfo.zUser.commits.forEach((commit) => {
+        commit.commitResults.forEach((slice) => {
+          if (selectedHashes.includes(slice.hash) && slice.isOpen !== undefined) {
+            slice.isOpen = isActive;
+          }
+        });
+      });
     },
 
     removeZoomHashes() {
