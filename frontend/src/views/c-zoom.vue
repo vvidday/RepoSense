@@ -121,13 +121,12 @@
           span &nbsp;{{ tag }}
       a(
         v-if="slice.messageBody !== ''",
-        v-on:click="updateExpandedCommitMessagesCount",
-        onclick="toggleNext(this)"
+        v-on:click="toggleSelectedCommitMessageBody(slice.hash)"
       )
         .tooltip
           font-awesome-icon.commit-message--button(icon="ellipsis-h")
           span.tooltip-text Click to show/hide the commit message body
-      .body(v-if="slice.messageBody !== ''")
+      .body(v-if="slice.messageBody !== ''", v-show="slice.isOpen")
         pre {{ slice.messageBody }}
           .dashed-border
 </template>
@@ -161,7 +160,6 @@ export default {
   },
   data() {
     return {
-      expandedCommitMessagesCount: this.totalCommitMessageBodyCount,
       ...zoomInitialState(),
     };
   },
@@ -198,23 +196,29 @@ export default {
 
       return new User(filteredUser);
     },
-    selectedCommits() {
-      const commits = [];
-      this.filteredUser.commits.forEach((commit) => {
-        const filteredCommit = { ...commit };
-        filteredCommit.commitResults = [];
-        commit.commitResults.forEach((slice) => {
-          if (Object.keys(slice.fileTypesAndContributionMap).some(
-              (fileType) => this.selectedFileTypes.indexOf(fileType) !== -1,
-          )) {
-            filteredCommit.commitResults.push(slice);
+    selectedCommits: {
+      get() {
+        const commits = [];
+        this.filteredUser.commits.forEach((commit) => {
+          const filteredCommit = { ...commit };
+          filteredCommit.commitResults = [];
+          commit.commitResults.forEach((slice) => {
+            if (Object.keys(slice.fileTypesAndContributionMap).some(
+                (fileType) => this.selectedFileTypes.indexOf(fileType) !== -1,
+            )) {
+              filteredCommit.commitResults.push(slice);
+            }
+          });
+          if (filteredCommit.commitResults.length > 0) {
+            commits.push(filteredCommit);
           }
         });
-        if (filteredCommit.commitResults.length > 0) {
-          commits.push(filteredCommit);
-        }
-      });
-      return commits;
+        return commits;
+      },
+
+      set(newValue) {
+        return newValue;
+      },
     },
     totalCommitMessageBodyCount() {
       let nonEmptyCommitMessageCount = 0;
@@ -227,6 +231,11 @@ export default {
       });
 
       return nonEmptyCommitMessageCount;
+    },
+    expandedCommitMessagesCount() {
+      return this.selectedCommits.reduce((prev, commit) => (
+        prev + commit.commitResults.filter((slice) => slice.isOpen).length
+      ), 0);
     },
     isSelectAllChecked: {
       get() {
@@ -364,19 +373,23 @@ export default {
       encodeHash();
     },
 
+    toggleSelectedCommitMessageBody(commitHash) {
+      this.selectedCommits = this.selectedCommits.map((commit) => commit.commitResults.map((slice) => {
+        if (slice.hash === commitHash) {
+          slice.isOpen = !slice.isOpen;
+        }
+        return slice;
+      }));
+    },
+
     toggleAllCommitMessagesBody(isActive) {
       this.showAllCommitMessageBody = isActive;
-
-      const toRename = this.showAllCommitMessageBody
-        ? 'commit-message message-body active'
-        : 'commit-message message-body';
-
-      const commitMessageClasses = document.getElementsByClassName('commit-message message-body');
-      Array.from(commitMessageClasses).forEach((commitMessageClass) => {
-        commitMessageClass.className = toRename;
-      });
-
-      this.expandedCommitMessagesCount = isActive ? this.totalCommitMessageBodyCount : 0;
+      this.selectedCommits = this.selectedCommits.map((commit) => commit.commitResults.map((slice) => {
+        if (slice.isOpen !== undefined) {
+          slice.isOpen = isActive;
+        }
+        return slice;
+      }));
     },
 
     updateExpandedCommitMessagesCount() {
