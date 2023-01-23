@@ -175,16 +175,26 @@ export default {
       return (a, b) => (this.toReverseSortedCommits ? -1 : 1)
         * window.comparator(commitSortFunction)(a, b);
     },
+    initialUser() {
+      const { zUser } = this.info;
+      const initialUser = Object.assign({}, zUser);
+      initialUser.commits.forEach((commit) => {
+        commit.commitResults.forEach((slice) => {
+          if (slice.messageBody !== '') {
+            slice.isOpen = true;
+          }
+        });
+      });
+      return initialUser;
+    },
     filteredUser() {
       const {
-        zUser, zSince, zUntil, zTimeFrame,
+        zSince, zUntil, zTimeFrame,
       } = this.info;
-      const filteredUser = Object.assign({}, zUser);
-
+      const filteredUser = this.initialUser;
       const date = zTimeFrame === 'week' ? 'endDate' : 'date';
-      filteredUser.commits = zUser.commits.filter(
-          (commit) => commit[date] >= zSince && commit[date] <= zUntil,
-      ).sort(this.sortingFunction);
+      const tmp = this.initialUser.commits.filter((commit) => commit[date] >= zSince && commit[date] <= zUntil);
+      filteredUser.commits = tmp.sort(this.sortingFunction);
 
       return new User(filteredUser);
     },
