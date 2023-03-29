@@ -139,7 +139,6 @@ import { mapState } from 'vuex';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import brokenLinkDisabler from '../mixin/brokenLinkMixin';
 import cRamp from '../components/c-ramp.vue';
-import User from '../utils/user';
 
 const getFontColor = window.getFontColor;
 
@@ -187,7 +186,7 @@ export default {
         (commit) => commit[date] >= zSince && commit[date] <= zUntil,
       ).sort(this.sortingFunction);
 
-      return new User(filteredUser);
+      return filteredUser;
     },
     selectedCommits() {
       if (this.isSelectAllChecked) {

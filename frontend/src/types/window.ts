@@ -1,6 +1,6 @@
 import JSZip from 'jszip';
-import User from '../utils/user';
-import { Repo, User as UserType } from './types';
+// import User from '../utils/user';
+import { Repo, User } from './types';
 import { AuthorshipSchema } from './zod/authorship-type';
 import { AuthorDailyContributions } from './zod/commits-type';
 import { DomainUrlMap, ErrorMessage } from './zod/summary-type';
@@ -61,7 +61,7 @@ declare global {
     getCommitLink: (repoId: string, commitHash: string) => string | undefined;
     getBlameLink: (repoId: string, branch: string, filepath: string) => string | undefined;
     getHistoryLink: (repoId: string, branch: string, filepath: string) => string | undefined;
-    getGroupName: (group: UserType[], filterGroupSelection: string) => string;
+    getGroupName: (group: User[], filterGroupSelection: string) => string;
     getAuthorDisplayName: (authorRepos: Repo[]) => string;
     api: Api;
     sinceDate: string;

@@ -1,8 +1,8 @@
-import { DailyCommit, CommitResult } from '../types/types';
+import { DailyCommit, CommitResult, User } from '../types/types';
 import { authorshipSchema } from '../types/zod/authorship-type';
 import { commitsSchema } from '../types/zod/commits-type';
 import { ErrorMessage, summarySchema } from '../types/zod/summary-type';
-import User from './user';
+// import User from './user';
 
 // utility functions //
 window.$ = (id) => document.getElementById(id);
@@ -258,7 +258,7 @@ window.api = {
         ];
 
         // commits and checkedFileTypeContribution are set in c-summary
-        const user = new User({
+        const user = {
           name: author,
           repoId: repoName,
           variance: commits.authorContributionVariance[author],
@@ -270,7 +270,7 @@ window.api = {
           repoName: `${repo.displayName}`,
           location: `${repo.location.location}`,
           checkedFileTypeContribution: 0,
-        });
+        };
 
         res.push(user);
       }

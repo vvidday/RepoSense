@@ -35,7 +35,7 @@
 
 <script>
 import brokenLinkDisabler from '../mixin/brokenLinkMixin';
-import User from '../utils/user';
+import { User } from '../types/types';
 
 export default {
   name: 'c-ramp',
