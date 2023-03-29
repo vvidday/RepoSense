@@ -535,7 +535,7 @@ export default defineComponent({
       let mergedVariance = 0;
       let totalMergedCheckedFileTypeCommits = 0;
       filtered[groupIndex].forEach((user) => {
-        user.commits?.forEach((commit) => {
+        user.commits.forEach((commit) => {
           this.mergeCommits(commit, user, dateToIndexMap, mergedCommits);
         });
         user.dailyCommits.forEach((commit) => {
@@ -638,9 +638,6 @@ export default defineComponent({
 
     splitCommitsWeek(user: User, sinceDate: string, untilDate: string) {
       const { commits } = user;
-      if (commits === undefined) {
-        return;
-      }
 
       const res: Commit[] = [];
 
@@ -732,7 +729,7 @@ export default defineComponent({
             });
             // The typecast is safe here as we add the insertions and deletions fields
             // in the filterCommitByCheckedFileTypes method above
-            user.commits?.push(filteredCommit as Commit);
+            user.commits.push(filteredCommit as Commit);
           }
         }
       });

@@ -35,7 +35,7 @@ export function isCommit(commit: Commit | DailyCommit): commit is Commit {
 
 export interface User {
   checkedFileTypeContribution: number;
-  commits?: Commit[];
+  commits: Commit[];
   dailyCommits: DailyCommit[];
   displayName: string;
   fileTypeContribution: AuthorFileTypeContributions;
