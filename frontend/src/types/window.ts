@@ -46,6 +46,7 @@ declare global {
     REPORT_ZIP: JSZip | null;
     deactivateAllOverlays: () => void;
     getDateStr: (date: number) => string;
+    getFontColor: (color: string) => string;
     getHexToRGB: (color: string) => number[];
     addHash: (newKey: string, newVal: string | boolean) => void;
     removeHash: (key: string) => void;
