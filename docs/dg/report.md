@@ -84,7 +84,9 @@ This archive will be used in place of the network files to load information into
 The API module will be handling all requests for all the JSON data files. If the network file is not available, the files will be obtained from the zip archive provided.
 
 ### Retrieving and parsing information
-After the JSON files are loaded from their respective sources, the data will be parsed as objects and included inside the global storage object, `window.REPOS`,  in the right format.
+After the JSON files are loaded from their respective sources, the raw data within these JSON files are validated against pre-defined schemas. This is done to ensure that the data in the JSON files are valid, and can be transformed into objects that contain all the expected properties. The validation is done using [zod](https://zod.dev/), a schema declaration and validation library. The definitions of the schemas can be found under `types/zod`.
+
+If the validation is successful, the data will be parsed as objects and included inside the global storage object, `window.REPOS`,  in the right format. Otherwise, an error is thrown to prevent passing potentially invalid data to the rest of the application.
 
 For the basic skeleton of `window.REPOS`, refer to the generated `summary.json` file in the report for more details.
 
